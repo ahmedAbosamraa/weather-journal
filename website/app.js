@@ -18,20 +18,20 @@ btn.addEventListener('click', async () => {
 
     const getData = async function () {
         try {
-            const apiResponse = await fetch(url);
-            console.log(apiResponse);
-            const response = await apiResponse.json();
-            const temperature = response.main.temp;
-            console.log(temperature);
+            const res = await fetch(url);
+            console.log(res);
+            const response = await res.json();
+            const tempe = res.main.temp;
+            console.log(temp);
 
         } catch (error) {
-            // code to log error
-            console.log("catch Get error", error);
+
+            console.log("error in get", error);
         }
     };
 
 
-    //post function
+    //post
 
     const postData = async function (url = "", data = {}) {
 
@@ -49,12 +49,12 @@ btn.addEventListener('click', async () => {
             console.log('done');
             console.log(feeling.value);
         } catch (error) {
-            console.log("catch post error", error);
+            console.log("error in post", error);
         }
     }
 
 
-    // update UI
+
     const updateData = async () => {
         const request = await fetch('/getdata');
         console.log(newDate)
@@ -70,11 +70,11 @@ btn.addEventListener('click', async () => {
         }
         catch (error) {
             console.log("error", error);
-            // appropriately handle the error
+
         }
     }
 
-    //checking
+
     if (!zipCode.value) {
         alert("please enter the zip code");
         console.log(zipCode.value);
