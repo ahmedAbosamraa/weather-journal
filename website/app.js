@@ -2,28 +2,29 @@
 const apiKey = '6cb1b64495f21d8d3c7123ebb3e3755b&units=metric';
 let date = document.getElementById('date');
 let temp = document.getElementById('temp');
-let content = document.getElementById('content');
+let cont = document.getElementById('content');
+const feelings = document.getElementById('feelings');
+const zipCode = document.getElementById('zip');
+let temperature;
 // Create a new date instance dynamically with JS
 let d = new Date();
 let newDate = d.getMonth() + 1 + '.' + d.getDate() + '.' + d.getFullYear();
 const btn = document.querySelector("#generate");
 btn.addEventListener('click', async () => {
 
-    const zipCode = document.getElementById('zip');
     console.log(zipCode.value);
-    const feeling = document.getElementById('feelings');
 
     const url = `http://api.openweathermap.org/data/2.5/weather?zip=${zipCode.value}&appid=${apiKey}`;
 
 
     const getData = async function () {
         try {
-            const res = await fetch(url);
-            console.log(res);
-            const response = await res.json();
-            const tempe = res.main.temp;
-            console.log(temp);
-
+            const apiRes = await fetch(url);
+            console.log(apiRes);
+            const res = await apiRes.json();
+            temperature = res.main.temp;
+            console.log(temperature);
+            return temperature
         } catch (error) {
 
             console.log("error in get", error);
@@ -33,23 +34,25 @@ btn.addEventListener('click', async () => {
 
     //post
 
-    const postData = async function (url = "", data = {}) {
+    const postData = async (url = '', data = {}) => {
+        console.log('data');
+        console.log(data);
+        const response = await fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // Body data type must match "Content-Type" header        
+            body: JSON.stringify(data),
+        });
 
         try {
-            await fetch(url, {
-                method: "POST",
-                credentials: "same-origin",
-                header: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-
-
-            console.log('done');
-            console.log(feeling.value);
+            const newData = await response.json();
+            console.log(newData);
+            return newData;
         } catch (error) {
-            console.log("error in post", error);
+            console.log("error", error);
         }
     }
 
@@ -58,15 +61,15 @@ btn.addEventListener('click', async () => {
     const updateData = async () => {
         const request = await fetch('/getdata');
         console.log(newDate)
+        console.log(request)
         try {
             // Transform into JSON
             const allData = await request.json()
             console.log(allData)
-            console.log(request)
             // Write updated data to DOM elements
-            document.getElementById('temp').innerHTML = allData.temp + ' degrees';
-            document.getElementById('content').innerHTML = allData.feel;
-            document.getElementById("date").innerHTML = allData.date;
+            temp.innerHTML = allData.temp + ' degrees';
+            content.innerHTML = allData.content;
+            date.innerHTML = allData.date;
         }
         catch (error) {
             console.log("error", error);
@@ -79,11 +82,12 @@ btn.addEventListener('click', async () => {
         alert("please enter the zip code");
         console.log(zipCode.value);
     } else {
-        getData().then((data) => {
+        getData().then((d) => {
+            console.log(d);
             postData("/postdata", {
-                temp: data,
+                temp: temperature,
                 date: newDate,
-                content: feelings,
+                content: feelings.value,
             }).then(() => {
                 updateData();
             });
